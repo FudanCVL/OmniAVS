@@ -23,7 +23,7 @@
   <img src="assets/teaser.png" width="75%">
 </p>
 
-# News
+# 📰 News
 
 - **20250728** | Code and dataset will be released in August. Stay tuned:)
 
