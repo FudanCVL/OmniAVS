@@ -4,7 +4,7 @@
   <p align="center">
     <a><strong>Kaining Ying</strong>
     ·
-    <a href=https://henghuiding.com/><strong>Henghui Ding<sup> ✉️ </sup></strong></a>
+    <a href=https://henghuiding.com/><strong>Henghui Ding</strong></a><sup> ✉️ </sup>
     ·
     <a><strong>Guangquan Jie</strong></a>
     ·
@@ -23,6 +23,9 @@
   <img src="assets/teaser.png" width="75%">
 </p>
 
+# News
+
+- **20250728** | Code and dataset will be released in August. Stay tuned:)
 
 
 
@@ -74,7 +77,7 @@ OmniAVS is licensed under a CC BY-NC-SA 4.0 License. The data of OmniAVS is rele
 If you find our paper and dataset useful for your research, please generously cite our paper.
 
 ```
-@inproceedings{ying2025move,
+@inproceedings{ying2025omniavs,
     title={{T}owards {O}mnimodal {E}xpressions and {R}easoning in {R}eferring {A}udio-{V}isual {S}egmentation, 
     author={Kaining Ying and Henghui Ding and Guangquan Jie and Yu-Gang Jiang},
     year={2025},
