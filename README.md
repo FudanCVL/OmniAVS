@@ -23,6 +23,8 @@
   <img src="assets/teaser.png" width="75%">
 </p>
 
+<strong>TL;DR:</strong> OmniAVS aims to segment objects in audiovisual videos based on multimodal referring expressions that flexibly combine text, speech, sound, and visual cues, requiring deep understanding and reasoning about audiovisual content.
+
 # 📰 News
 
 - **20250728** | Code and dataset will be released in August. Stay tuned:)
