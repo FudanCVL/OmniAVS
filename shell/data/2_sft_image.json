@@ -1,0 +1,65 @@
+{
+  "ade20k": {
+    "root": "playground/data/segmentation/ade20k",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_expression_per_sample": 4
+  },
+  "reason_seg": {
+    "root": "playground/data/segmentation/reason_seg/train",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_expression_per_sample": 4
+  },
+  "grefcoco": {
+    "data_root": "playground/data/segmentation/lisa_data/refer_seg",
+    "data_augment": false,
+    "num_expression_per_sample": 4,
+    "repeat_time": 1,
+    "length": -1
+  },
+  "refcoco": {
+    "data_root": "playground/data/segmentation/lisa_data/refer_seg",
+    "data_augment": false,
+    "num_expression_per_sample": 4,
+    "repeat_time": 1,
+    "length": -1
+  },
+  "refcoco+": {
+    "data_root": "playground/data/segmentation/lisa_data/refer_seg",
+    "data_augment": false,
+    "num_expression_per_sample": 4,
+    "repeat_time": 1,
+    "length": -1
+  },
+  "refcocog": {
+    "data_root": "playground/data/segmentation/lisa_data/refer_seg",
+    "data_augment": false,
+    "num_expression_per_sample": 4,
+    "repeat_time": 1,
+    "length": -1
+  },
+  "cocostuff": {
+    "base_image_dir": "playground/data/segmentation/lisa_data",
+    "num_expression_per_sample": 4,
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1
+  },
+  "pascal_part": {
+    "base_image_dir": "playground/data/segmentation/lisa_data",
+    "num_expression_per_sample": 4,
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1
+  },
+  "paco_lvis": {
+    "base_image_dir": "playground/data/segmentation/lisa_data",
+    "num_expression_per_sample": 4,
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1
+  }
+}

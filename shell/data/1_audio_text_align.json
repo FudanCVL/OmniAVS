@@ -1,0 +1,86 @@
+{
+  "auto_acd_vggsound_train_159917": {
+    "root": "playground/data/auto_acd/vggsound/scratch/shared/beegfs/hchen/train_data/VGGSound_final/video",
+    "annotation": "playground/data/auto_acd/auto_acd_vggsound_train_159917.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 159917
+  },
+  "auto_acd_audioset_train_1695912": {
+    "root": "playground/data/auto_acd/audioset_audio_file/audio/unbal_train",
+    "annotation": "playground/data/auto_acd/auto_acd_audioset_train_1695912.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 1695912
+  },
+  "clotho_aqa_train_6085": {
+    "root": "playground/data/clotho_aqa/audio_files",
+    "annotation": "playground/data/clotho_aqa/clotho_aqa_train_6085.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 6085
+  },
+  "wavcaps_train_108317": {
+    "root": "playground/data/wavcaps/Zip_files/AudioSet_SL/mnt/fast/nobackup/scratch4weeks/xm00178/WavCaps/data/waveforms/AudioSet_SL_flac",
+    "annotation": "playground/data/wavcaps/wavcaps_train_108317.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 108317
+  },
+  "musiccaps_train_4753": {
+    "root": "playground/data/musiccaps/metadata/wav",
+    "annotation": "playground/data/musiccaps/musiccaps_train_4753.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 4753
+  },
+  "vocalsound_train_15531": {
+    "root": "playground/data/vocalsound/audio_16k",
+    "annotation": "playground/data/vocalsound/vocalsound_train_15531.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 15531
+  },
+  "aishell2_asr_zh_train_47200": {
+    "root": "playground/data/sharegpt4o/mnt/petrelfs/wangweiyun/workspace_cef/dataset/Aishell-2/",
+    "annotation": "playground/data/sharegpt4o/aishell2_asr_zh_train_47200.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 47200
+  },
+  "commonvoice_asr_zh_train_24051": {
+    "root": "playground/data/sharegpt4o/mnt/petrelfs/wangweiyun/workspace_cef/dataset/commonvoice/",
+    "annotation": "playground/data/sharegpt4o/commonvoice_asr_zh_train_24051.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 24051
+  },
+  "commonvoice_asr_en_train_4063": {
+    "root": "playground/data/sharegpt4o/mnt/petrelfs/wangweiyun/workspace_cef/dataset/commonvoice/",
+    "annotation": "playground/data/sharegpt4o/commonvoice_asr_en_train_4063.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 4063
+  },
+  "gigaspeech_asr_zh_train_301723": {
+    "root": "playground/data/sharegpt4o/mnt/petrelfs/wangweiyun/workspace_cef/dataset/GigaSpeech/audio_segment",
+    "annotation": "playground/data/sharegpt4o/gigaspeech_asr_zh_train_301723.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 301723
+  },
+  "magicdata_ramc_asr_zh_train_113725": {
+    "root": "playground/data/sharegpt4o/mnt/petrelfs/wangweiyun/workspace_cef/dataset/magicdata_ramc",
+    "annotation": "playground/data/sharegpt4o/magicdata_ramc_asr_zh_train_113725.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 113725
+  },
+  "gigaspeech_asr_en_m_processed_train_485799": {
+    "root": "playground/data/gigaspeech/annotation/data/all_audio",
+    "annotation": "playground/data/gigaspeech/gigaspeech_asr_en_m_processed_train_485799.jsonl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": 485799
+  }
+}

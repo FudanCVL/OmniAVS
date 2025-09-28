@@ -1,0 +1,204 @@
+# Copyright (c) Shanghai AI Lab. All rights reserved.
+import logging
+import math
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from timm.models.layers import trunc_normal_
+from torch.nn.init import normal_
+
+try:
+    from ops.deformable_attention.modules import MSDeformAttn
+except:
+    print("Please install MSDeformAttn if you want to use ViT-Adapter")
+from .adapter_modules import SpatialPriorModule, InteractionBlock, deform_inputs, LayerNorm
+from .modeling_intern_vit import InternVisionModel
+
+from transformers.modeling_outputs import (BaseModelOutput,
+                                           BaseModelOutputWithPooling)
+
+
+_logger = logging.getLogger(__name__)
+
+
+def _freeze_params(module):
+    for param in module.parameters():
+        param.requires_grad = False
+
+
+class InternVisionModelAdapter(InternVisionModel):
+    def __init__(self, 
+                 config,
+                 pretrain_size=224, 
+                 num_heads=25, 
+                 conv_inplane=64, 
+                 n_points=4, 
+                 deform_num_heads=16,
+                 init_values=0., 
+                 interaction_indexes=[[0, 5], [6, 11], [12, 17], [18, 23]], 
+                 with_cffn=True, 
+                 cffn_ratio=0.25,
+                 deform_ratio=0.25, 
+                 add_vit_feature=True, 
+                 use_extra_extractor=True, 
+                 with_cp=True,
+                 out_indices=(0, 1, 2, 3), 
+                 use_final_norm=True,
+                 drop_path_rate=0.0,
+                 *args, 
+                 **kwargs):
+
+        # super().__init__(num_heads=num_heads, with_cp=with_cp, *args, **kwargs)
+        super().__init__(config=config)
+        # self.num_classes = 80
+        self.cls_token = None
+        self.num_block = len(self.encoder.layers)
+        self.pretrain_size = (pretrain_size, pretrain_size)
+        self.interaction_indexes = interaction_indexes
+        self.add_vit_feature = add_vit_feature
+        self.out_indices = out_indices
+        self.use_final_norm = use_final_norm
+        embed_dim = self.embeddings.position_embedding.shape[-1]
+
+        self.level_embed = nn.Parameter(torch.zeros(3, embed_dim))
+        self.spm = SpatialPriorModule(inplanes=conv_inplane, embed_dim=embed_dim,
+                                      out_indices=out_indices)
+        self.interactions = nn.Sequential(*[
+            InteractionBlock(dim=embed_dim, num_heads=deform_num_heads, n_points=n_points,
+                             init_values=init_values, drop_path=drop_path_rate,
+                             norm_layer=nn.LayerNorm, with_cffn=with_cffn,
+                             cffn_ratio=cffn_ratio, deform_ratio=deform_ratio,
+                             extra_extractor=((True if i == len(
+                                 interaction_indexes) - 1 else False) and use_extra_extractor),
+                             with_cp=with_cp, with_injector=False)
+            for i in range(len(interaction_indexes))
+        ])
+        if len(out_indices) == 4:
+            self.up = nn.ConvTranspose2d(embed_dim, embed_dim, 2, 2)
+            if self.use_final_norm:
+                self.norm1 = LayerNorm(embed_dim)
+            self.up.apply(self._init_weights)
+
+        if self.use_final_norm:
+            self.norm2 = LayerNorm(embed_dim)
+            self.norm3 = LayerNorm(embed_dim)
+            self.norm4 = LayerNorm(embed_dim)
+
+        self.spm.apply(self._init_weights)
+        self.interactions.apply(self._init_weights)
+        self.apply(self._init_deform_weights)
+        normal_(self.level_embed)
+        _freeze_params(self.encoder)
+        _freeze_params(self.embeddings)
+        # self.pos_embed.requires_grad = False
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            trunc_normal_(m.weight, std=.02)
+            if isinstance(m, nn.Linear) and m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.LayerNorm) or isinstance(m, LayerNorm):
+            nn.init.constant_(m.bias, 0)
+            nn.init.constant_(m.weight, 1.0)
+        elif isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+            fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+            fan_out //= m.groups
+            m.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+            if m.bias is not None:
+                m.bias.data.zero_()
+
+    def _init_deform_weights(self, m):
+        if isinstance(m, MSDeformAttn):
+            m._reset_parameters()
+
+    def _add_level_embed(self, c2, c3, c4):
+        c2 = c2 + self.level_embed[0]
+        c3 = c3 + self.level_embed[1]
+        c4 = c4 + self.level_embed[2]
+        return c2, c3, c4
+    
+    def patch_embed(self, pixel_values: torch.FloatTensor) -> torch.Tensor:
+        target_dtype = self.embeddings.patch_embedding.weight.dtype
+        patch_embeds = self.embeddings.patch_embedding(pixel_values)  # shape = [*, channel, width, height]
+        batch_size, _, height, width = patch_embeds.shape
+        patch_embeds = patch_embeds.flatten(2).transpose(1, 2)
+        class_embeds = self.embeddings.class_embedding.expand(batch_size, 1, -1).to(target_dtype)
+        embeddings = torch.cat([class_embeds, patch_embeds], dim=1)
+        position_embedding = torch.cat([
+            self.embeddings.position_embedding[:, :1, :],
+            self.embeddings._get_pos_embed(self.embeddings.position_embedding[:, 1:, :], height, width)
+        ], dim=1)
+        embeddings = embeddings + position_embedding.to(target_dtype)
+        return embeddings, height, width
+
+    def forward(self, pixel_values, output_hidden_states, return_dict):
+        x = pixel_values
+        deform_inputs1, deform_inputs2 = deform_inputs(x)
+        x = x.to(self.dtype)
+        # SPM forward
+        if len(self.out_indices) == 4:
+            c1, c2, c3, c4 = self.spm(x)
+        else:
+            c2, c3, c4 = self.spm(x)
+
+        c2, c3, c4 = self._add_level_embed(c2, c3, c4)
+        c = torch.cat([c2, c3, c4], dim=1)
+
+        # Patch Embedding forward
+        x, H, W = self.patch_embed(x)
+        H_, W_ = pixel_values.shape[-2] // 16, pixel_values.shape[-1] // 16
+        bs, n, dim = x.shape
+        # pos_embed = self._get_pos_embed(self.pos_embed[:, 1:], H, W)
+        # x = self.pos_drop(x + self.embeddings.pos_embed[:, 1:])  
+
+        # Interaction
+        for i, layer in enumerate(self.interactions):
+            indexes = self.interaction_indexes[i]
+            x, c = layer(x, c, self.encoder.layers[indexes[0]:indexes[-1] + 1],
+                         deform_inputs1, deform_inputs2, H_, W_)
+
+        # Split & Reshape
+        c2 = c[:, 0:c2.size(1), :]
+        c3 = c[:, c2.size(1):c2.size(1) + c3.size(1), :]
+        c4 = c[:, c2.size(1) + c3.size(1):, :]
+
+        c2 = c2.transpose(1, 2).view(bs, dim, H_ * 2, W_ * 2).contiguous()
+        c3 = c3.transpose(1, 2).view(bs, dim, H_, W_).contiguous()
+        c4 = c4.transpose(1, 2).view(bs, dim, H_ // 2, W_ // 2).contiguous()
+        if len(self.out_indices) == 4:
+            c1 = self.up(c2) + c1
+
+        if self.add_vit_feature:
+            if len(self.out_indices) == 4:
+                x3 = x[:, 1:].transpose(1, 2).view(bs, dim, H, W).contiguous()
+                x3 = F.interpolate(x3, size=(H_, W_), mode='bilinear', align_corners=False)
+                x2 = F.interpolate(x3, scale_factor=2, mode='bilinear', align_corners=False)
+                x1 = F.interpolate(x3, scale_factor=4, mode='bilinear', align_corners=False)
+                x4 = F.interpolate(x3, scale_factor=0.5, mode='bilinear', align_corners=False)
+                c1, c2, c3, c4 = c1 + x1, c2 + x2, c3 + x3, c4 + x4
+            else:
+                x3 = x[:, 1:].transpose(1, 2).view(bs, dim, H, W).contiguous()
+                x3 = F.interpolate(x3, size=(H_, W_), mode='bilinear', align_corners=False)
+                x2 = F.interpolate(x3, scale_factor=2, mode='bilinear', align_corners=False)
+                x4 = F.interpolate(x3, scale_factor=0.5, mode='bilinear', align_corners=False)
+                c2, c3, c4 = c2 + x2, c3 + x3, c4 + x4
+        last_hidden_state = x
+        # Final Norm
+        if self.use_final_norm:
+            if len(self.out_indices) == 4:
+                f1 = self.norm1(c1.float()).contiguous()  # 1 / 4
+                f2 = self.norm2(c2.float()).contiguous()  # 1 / 8
+                f3 = self.norm3(c3.float()).contiguous()  # 1 / 16
+                f4 = self.norm4(c4.float()).contiguous()  # 1 / 32
+                return BaseModelOutputWithPooling(last_hidden_state=last_hidden_state), [f1, f2, f3, f4]
+            else:
+                f2 = self.norm2(c2.float()).contiguous()
+                f3 = self.norm3(c3.float()).contiguous()
+                f4 = self.norm4(c4.float()).contiguous()
+                return BaseModelOutputWithPooling(last_hidden_state=last_hidden_state), [f2, f3, f4]
+        else:
+            return BaseModelOutputWithPooling(last_hidden_state=last_hidden_state), [c1.float().contiguous(),
+                    c2.float().contiguous(),
+                    c3.float().contiguous(),
+                    c4.float().contiguous()]

@@ -1,0 +1,65 @@
+{
+  "omniavs": {
+    "root": "playground/data/segmentation/omniavs",
+    "meta_expression_path": "playground/data/segmentation/omniavs/meta_expressions_train.jsonl",
+    "video_dict_path": "playground/data/segmentation/omniavs/video_dict.json",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_frames": 10
+  },
+  "lvvis": {
+    "root": "playground/data/segmentation/lvvis/train/",
+    "expression_path": "playground/data/segmentation/lvvis/train/meta_expressions.json",
+    "mask_path": "playground/data/segmentation/lvvis/train/mask_dict.json",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_frames": 10
+  },
+  "mevis": {
+    "root": "playground/data/segmentation/mevis/train/",
+    "expression_path": "playground/data/segmentation/mevis/train/meta_expressions.json",
+    "mask_path": "playground/data/segmentation/mevis/train/mask_dict.json",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_frames": 10
+  },
+  "revos": {
+    "root": "playground/data/segmentation/revos",
+    "expression_path": "playground/data/segmentation/revos/meta_expressions_train_.json",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_frames": 10
+  },
+  "refer_ytvos": {
+    "root": "playground/data/segmentation/refer_ytvos/train",
+    "expression_path": "playground/data/segmentation/refer_ytvos/meta_expressions/train/meta_expressions.json",
+    "mask_dict_path": "playground/data/segmentation/refer_ytvos/train/mask_dict.pkl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_frames": 10
+  },
+  "refer_davis": {
+    "root": "playground/data/segmentation/davis17/train",
+    "expression_path": "playground/data/segmentation/davis17/train/meta_expressions.json",
+    "mask_dict_path": "playground/data/segmentation/davis17/train/mask_dict.pkl",
+    "data_augment": false,
+    "repeat_time": 1,
+    "length": -1,
+    "num_frames": 10
+  },
+  "refavs": {
+    "root": "playground/data/segmentation/refavs/train",
+    "meta_path": "playground/data/segmentation/refavs/metadata.csv",
+    "data_augment": false,
+    "repeat_time": 1,
+    "num_frames": 10,
+    "media_path": "playground/data/segmentation/refavs/media",
+    "gt_mask_path": "playground/data/segmentation/refavs/gt_mask",
+    "split": "train"
+  }
+}

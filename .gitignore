@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtual Environment
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Data
+*.pkl
+*.h5
+*.npy
+*.npz
+
+# Logs
+logs/
+*.log
+tensorboard/
+
+# Models
+*.pth
+*.pt
+*.bin
+checkpoints/
+weights/
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python cache files
+internvl/__pycache__/
+
+pyrightconfig.json
+
+playground/data
+playground/pretrained/*
+
+_torchshow/
+_not_released/
+work_dirs/
+log_dir/
+pyrightconfig.json

@@ -1,0 +1,11 @@
+{
+  "omniavs": {
+      "root": "playground/data/segmentation/omniavs",
+      "meta_expression_path": "playground/data/segmentation/omniavs/meta_expressions_train.jsonl",
+      "video_dict_path": "playground/data/segmentation/omniavs/video_dict.json",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": -1,
+      "num_frames": 10
+  }
+}
