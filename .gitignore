@@ -72,3 +72,4 @@ _not_released/
 work_dirs/
 log_dir/
 pyrightconfig.json
+output/

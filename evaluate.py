@@ -343,7 +343,7 @@ class OmniAVSDataset(torch.utils.data.Dataset):
         self.split = split
         
         self.raw_data = []
-        with open(os.path.join(ROOT_DIR, "meta_expressions_test_deduplicated.jsonl"), 'r') as f:
+        with open(os.path.join(ROOT_DIR, "meta_expressions_test.jsonl"), 'r') as f:
             for line in f:
                 data = json.loads(line.strip())
                 if data['expr_type'] == self.split:
@@ -352,7 +352,7 @@ class OmniAVSDataset(torch.utils.data.Dataset):
         # self.raw_data = self.raw_data[:30]
         
         
-        self.video_dict = json.load(open(os.path.join(ROOT_DIR, "video_dict_new.json"), 'r'))
+        self.video_dict = json.load(open(os.path.join(ROOT_DIR, "video_dict.json"), 'r'))
         
         self.referring_image_path = osp.join(ROOT_DIR, 'referrings', 'referring_images')
         self.referring_speech_path = osp.join(ROOT_DIR, 'referrings', 'referring_speeches')
